@@ -1,8 +1,9 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { assets, products } from '../assets/frontend_assets/assets'
 import { ShopContext } from '../context/ShopContext'
 import Title from '../components/Title';
 import { Listbox } from '@headlessui/react'
+import ProductItem from '../components/ProductItem';
 
 const options = [
   { label: 'Sort by: Relevant', value: 'relevant' },
@@ -14,6 +15,74 @@ const Collection = () => {
 
  const {products} = useContext(ShopContext); 
  const [showFilter , setShowFilter] = useState(false);
+ const [filterProducts , setFilterProducts] = useState([]);
+ const [category, setCategory] = useState([]);
+ const [subCategory , setSubCategory] = useState([]);
+ const [sortType , setSortType] = useState('relevant')
+
+ // click kiya , app ko pta chala woh nhi hai , include kiya ( pehle else condition chalegi , kyuki by default checkbox is empty)
+ const toogleCategory = (e) =>{
+  if(category.includes(e.target.value)){
+     setCategory(prev => prev.filter(item => item !== e.target.value))
+  }
+
+  else{
+    setCategory(prev => [...prev, e.target.value]);
+  }
+ }
+
+  const toogleSubCategory = (e) =>{
+  if(subCategory.includes(e.target.value)){
+     setSubCategory(prev => prev.filter(item => item !== e.target.value))
+  }
+
+  else{
+    setSubCategory(prev => [...prev, e.target.value]);
+  }
+ }
+
+//  function for displaying individual product
+ const applyFilter = () =>{
+  let  productsCopy = products.slice();
+
+  if(category.length > 0){
+    productsCopy = productsCopy.filter(item => category.includes(item.category))
+  }
+
+  if(subCategory.length > 0){
+    productsCopy = productsCopy.filter(item => subCategory.includes(item.subCategory))
+  }
+
+  setFilterProducts(productsCopy);
+ }
+
+ const sortProduct = () => {
+   let  filterProductsCopy = filterProducts.slice();
+
+   switch(sortType){
+    case 'low-high':
+      setFilterProducts(filterProductsCopy.sort((a,b) => (a.price - b.price)))
+      break
+    
+      case 'high-low':
+        setFilterProducts(filterProductsCopy.sort((a,b) => (b.price - a.price)))
+        break
+      
+      default:
+        applyFilter()
+        break
+   }
+ }
+
+  useEffect(()=>{
+    applyFilter();
+ },[category , subCategory])
+
+ useEffect(() => {
+  sortProduct();
+ }, [sortType])
+
+
   return (
     <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10'>
       {/* Left Side Filter Options */}
@@ -26,13 +95,13 @@ const Collection = () => {
              <p className='mb-3 text-sm font-medium'>CATEGORIES</p>
              <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
                 <p className='gap-2 flex'>
-                  <input className='w-3' type='checkbox' value={'Men'}/> Men
+                  <input className='w-3' type='checkbox' value={'Men'} onChange={toogleCategory}/> Men
                 </p> 
                 <p className='gap-2 flex'>
-                  <input className='w-3' type='checkbox' value={'Women'}/> Women
+                  <input className='w-3' type='checkbox' value={'Women'} onChange={toogleCategory}/> Women
                 </p> 
                 <p className='gap-2 flex'>
-                  <input className='w-3' type='checkbox' value={'Kids'}/> Kids
+                  <input className='w-3' type='checkbox' value={'Kids'} onChange={toogleCategory}/> Kids
                 </p> 
              </div>
            </div>
@@ -41,13 +110,13 @@ const Collection = () => {
              <p className='mb-3 text-sm font-medium'>TYPE</p>
              <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
                 <p className='gap-2 flex'>
-                  <input className='w-3' type='checkbox' value={'Topwear'}/> Top Wear
+                  <input className='w-3' type='checkbox' value={'Topwear'} onChange={toogleSubCategory}/> Top Wear
                 </p> 
                 <p className='gap-2 flex'>
-                  <input className='w-3' type='checkbox' value={'Bottomwear'}/> Bottom Wear
+                  <input className='w-3' type='checkbox' value={'Bottomwear'} onChange={toogleSubCategory}/> Bottom Wear
                 </p> 
                 <p className='gap-2 flex'>
-                  <input className='w-3' type='checkbox' value={'Winterwear'}/> Winter Wear
+                  <input className='w-3' type='checkbox' value={'Winterwear'} onChange={toogleSubCategory}/> Winter Wear
                 </p> 
              </div>
            </div>
@@ -58,11 +127,19 @@ const Collection = () => {
         <div className='flex justify-between text-base sm:text-2xl mb-4'>
           <Title text1={'ALL'} text2={' COLLECTIONS'}/>
           {/* Product Sort */}
-          <select className="border-2 border-gray-300 text-sm px-3">
+          <select onChange={(e) => setSortType(e.target.value)} className="border-2 border-gray-300 text-sm px-3">
             <option value="relevant">Sort by: Relevant</option>
             <option value="low-high">Sort by: Price (Low to High)</option>
             <option value="high-low">Sort by: Price (High to Low)</option>
           </select>
+        </div>
+        {/* Map Products */}
+        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6'>
+          {
+            filterProducts.map((item, index) =>(
+                 <ProductItem key={index} id={item._id} image={item.image} name={item.name} price={item.price} />
+            ))
+          }
         </div>
       </div>
     </div>
