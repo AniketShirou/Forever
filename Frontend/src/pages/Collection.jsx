@@ -69,7 +69,7 @@ const Collection = () => {
       break
     
       case 'high-low':
-        setFilterProducts(filterProductsCopy.sort((a,b) => (b.price - a.price)))     
+        setFilterProducts(filterProductsCopy.sort((a,b) => (b.price - a.price)))
         break
       
       default:
