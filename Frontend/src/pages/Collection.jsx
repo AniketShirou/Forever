@@ -2,14 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import { assets, products } from '../assets/frontend_assets/assets'
 import { ShopContext } from '../context/ShopContext'
 import Title from '../components/Title';
-import { Listbox } from '@headlessui/react'
 import ProductItem from '../components/ProductItem';
 
-const options = [
-  { label: 'Sort by: Relevant', value: 'relevant' },
-  { label: 'Price: Low to High', value: 'low-high' },
-  { label: 'Price: High to Low', value: 'high-low' }
-];
 
 const Collection = () => {
 

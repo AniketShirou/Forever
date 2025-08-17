@@ -16,8 +16,8 @@ a.active hr{
   font-style: normal;
 }
 
-b:hover{
-    
+::-webkit-scrollbar{
+    display: none;
 }
 
 @media (max-width:640px) {
