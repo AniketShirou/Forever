@@ -10,7 +10,29 @@ const generateAuthToken = (id) => {
 
 // route for user login
 const loginUser = async (req, res) => {
-    res.send('Login User');
+    try {
+        const { email, password } = req.body;
+
+        //checking if user exists
+        const user = await User.findOne({ email });
+        if(!user){
+            return res.json({ message: 'User does not exist', success: false });
+        }
+
+        //validating password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(!isPasswordValid){
+            return res.json({ message: 'Invalid Credentials', success: false });
+        }
+
+        const token = generateAuthToken(user._id); // generating auth token for the user
+
+        res.json({ message: 'Login Successful', success: true, token });
+
+    } catch (error) {
+        console.error(error);
+        res.json({ message: error.message, success: false });  
+    }
 }
 
 // route for user registration
