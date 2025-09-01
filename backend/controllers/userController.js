@@ -76,14 +76,30 @@ const registerUser = async (req, res) => {
     } catch (error) {
 
         console.error(error);
-        res.status(500).json({ message: error.message, success: false });  
+        res.json({ message: error.message, success: false });  
 
     }
 }
 
 // route for admin login
 const adminUser = async (req, res) => {
-    res.send('Admin Login');   
+    try{
+
+        const { email, password } = req.body;
+
+        if(email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD){
+            return res.json({ message: 'Invalid Admin Credentials', success: false });
+        }
+
+        const token = generateAuthToken(email+password); // generating auth token for the admin
+
+        res.json({ message: 'Admin Login Successful', success: true, token });
+
+    } catch (error) {
+        console.error(error);
+        res.json({ message: error.message, success: false });  
+    }
+
 }
 
 export { loginUser, registerUser, adminUser};

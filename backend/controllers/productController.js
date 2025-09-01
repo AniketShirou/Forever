@@ -72,7 +72,10 @@ const singleProduct = async (req, res) => {
 // function for delete product by id[id in body] (only admin)
 const deleteProduct = async (req, res) => {
     try{
-         await Product.findByIdAndDelete(req.body.id);
+         const deletedProduct = await Product.findByIdAndDelete(req.body.id);
+        if (!deletedProduct) {
+            return res.json({ message: 'Product not found or already deleted', success: true });
+        }
          res.json({ message: 'Product Deleted Successfully', success: true });
     } catch (error) {
         console.error(error);
