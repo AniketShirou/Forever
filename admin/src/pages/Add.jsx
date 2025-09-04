@@ -1,7 +1,10 @@
 import React from 'react'
 import { assets } from '../assets/admin_assets/assets'
+import axios from 'axios'
+import { backend_url } from '../App'
+import { toast } from 'react-toastify'
 
-const Add = () => {
+const Add = ({token}) => {
 
   const [image1,setImage1] = React.useState(false);
   const [image2,setImage2] = React.useState(false);
@@ -27,18 +30,37 @@ const Add = () => {
         formData.append("description" , description)
         formData.append("price", price)
         formData.append("category" , category)
-        formData.append("sub-category" , subCategory)
+        formData.append("subCategory" , subCategory)
         formData.append("bestseller" , bestseller);
         formData.append("sizes" , JSON.stringify(sizes)); // array can't be sent in formData , converting to string
 
-        image1 && formData.append("image1" , image1);
-        image2 && formData.append("image2" , image2);
-        image3 && formData.append("image3" , image3);
-        image4 && formData.append("image4" , image4);
+        image1 && formData.append("images" , image1);
+        image2 && formData.append("images" , image2);
+        image3 && formData.append("images" , image3);
+        image4 && formData.append("images" , image4);
 
+        const res = await axios.post(`${backend_url}/api/v1/product/add`, formData, {headers: { Authorization: `Bearer ${token}`}});
+        
+        if(res.data.success){
+          toast.success(res.data.message)
+          setName('')
+          setDescription('')
+          setPrice(0)
+          setCategory('Men')
+          setSubCategory('Topwear')
+          setBestseller(false)
+          setSizes([])
+          setImage1(false)
+          setImage2(false)
+          setImage3(false)
+          setImage4(false);
+        } else{
+          toast.error(res.data.message)
+        }
 
       } catch(error){
          console.log(error)
+         toast.error(error.message)
       }
   }
 
